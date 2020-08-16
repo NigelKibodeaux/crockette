@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>IRC Downloader</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <button id="showLogs">⚙</button>
+
+        <form id="form">
+            <table>
+                <tr>
+                    <td><label>Link</label></td>
+                    <td><input id="linkElement"></td>
+                </tr>
+                <tr>
+                    <td><label>Trigger</label></td>
+                    <td><input id="messageElement"></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <a href="#" id="selectDownloadDirectory">Download Directory</a>: <span id="downloadDirectory"></span>
+                    </td>
+                </tr>
+            </table>
+            <button id="StartDownload">Download</button>
+        </form>
+
+        <div id="charts"></div>
+    </body>
+
+
+    <!-- You can also require other files to run in this process -->
+    <script src="./string_parser.js"></script>
+    <script src="./renderer.js"></script>
+</html>

@@ -1,0 +1,26 @@
+* {
+    font-family: sans-serif;
+}
+.filename {
+    font-weight: 800;
+}
+.progress-bar {
+    background-color: red;
+    height: 5px;
+}
+.progress-container {
+    margin-bottom: 20px;
+    padding: 2px;
+    border: 1px solid gray;
+}
+input {
+    width: 300px;
+}
+button#showLogs {
+    float: right;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        color: white;
+    }
+}
