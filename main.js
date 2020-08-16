@@ -3,12 +3,13 @@
 
 
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain, clipboard, dialog} = require('electron')
+const {app, BrowserWindow, ipcMain, clipboard, dialog, shell} = require('electron')
 const path = require('path')
 const {execSync} = require('child_process')
 const downloadManager = require('./download_manager')
 const settings = require('./settings')
 const updateCrockett = require('./update_crockett')
+const crocketteUpdateIsAvailable = require('./update_crockette')
 
 
 let mainWindow
@@ -16,26 +17,6 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
 
 
 //#region Initialize
-
-    function createWindow () {
-        // Create the browser window.
-        mainWindow = new BrowserWindow({
-            width: 1200,
-            height: 800,
-            webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
-            }
-        })
-
-        // and load the appropriate page
-        if (hasDomainAndPass)
-            mainWindow.loadFile('index.html')
-        else
-            mainWindow.loadFile('auth.html')
-
-        // Open the DevTools.
-        mainWindow.webContents.openDevTools()
-    }
 
     // Make this app handle irc://... links
     let is_default_irc_app = app.setAsDefaultProtocolClient('irc')
@@ -53,7 +34,25 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
     // This method will be called when Electron has finished
     // initialization and is ready to create browser windows.
     // Some APIs can only be used after this event occurs.
-    app.whenReady().then(() => createWindow())
+    app.whenReady().then(() => {
+        // Create the browser window
+        mainWindow = new BrowserWindow({
+            width: 1200,
+            height: 800,
+            webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+            }
+        })
+
+        // and load the appropriate page
+        if (hasDomainAndPass)
+            mainWindow.loadFile('index.html')
+        else
+            mainWindow.loadFile('auth.html')
+
+        // Open the DevTools.
+        // mainWindow.webContents.openDevTools()
+    })
     .then(() => {
         // Check that mono is installed on a mac.
         // This will throw an error if mono is not found.
@@ -69,11 +68,28 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
             }
         }
     })
-    .then(() => {
+    .then(async () => {
         // Update or install Crockett if need be
-        if (hasDomainAndPass) return updateCrockett()
+        if (hasDomainAndPass) await updateCrockett()
     })
-    .catch(console.log)
+    .then(async () => {
+        const updateIsAvailable = await crocketteUpdateIsAvailable()
+
+        if (updateIsAvailable) {
+            const clicked_button_index = dialog.showMessageBoxSync({
+                type: 'warning',
+                message: 'Download the latest version of Crockette',
+                buttons: ['Remind me next time', 'Now'], // these show up reversed
+            })
+
+            if (clicked_button_index === 1)
+                shell.openExternal('https://github.com/NigelKibodeaux/crockette/releases')
+        }
+        else {
+            console.log('You have the latest version of Crockette')
+        }
+    })
+    // .catch(console.log) // TODO: handle errors somehow?
 
     // Quit when all windows are closed.
     app.on('window-all-closed', () => app.quit())
