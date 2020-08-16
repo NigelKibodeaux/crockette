@@ -1,7 +1,7 @@
 {
   "name": "crockette",
   "productName": "Crockette",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -13,7 +13,7 @@
     "build-windows-zip": "cd dist/Crockette-win32-x64; zip -r ../Windows.zip .",
     "build": "npm run build-mac; npm run build-windows",
     "deploy-nigel": "npm run build-mac; rm -r /Applications/Crockette.app; cp -r ./dist/Crockette-darwin-x64/Crockette.app /Applications",
-    "remove-settings" : "rm ~/Library/Application\\ Support/Crockette/config.json",
+    "remove-settings": "rm ~/Library/Application\\ Support/Crockette/config.json",
     "preinstall": "echo 'checking for mono compiler' && mcs --version"
   },
   "devDependencies": {
