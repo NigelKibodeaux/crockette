@@ -48,7 +48,10 @@
         const ipc = window.ipcRenderer
         const $ = document.getElementById.bind(document)
 
+        // Handle logs button click
+        $('showLogs').onclick = () => ipc.send('show-logs')
 
+        // Handle form submit
         $('form').onsubmit = () => {
             const domain = $('domainInput').value
             const password = $('passwordInput').value
