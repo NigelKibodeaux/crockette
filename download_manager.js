@@ -6,6 +6,7 @@ const path = require('path')
 const {spawn} = require('child_process')
 const {EventEmitter} = require('events')
 const string_parser = require('./string_parser')
+const settings = require('./settings')
 const fs = require('fs')
 
 
@@ -33,14 +34,6 @@ function getNextColor() {
 }
 
 
-// Gets the currently set download dir
-function getDownloadDirectory() {
-    const settingsString = fs.readFileSync(path.join(__dirname, 'settings.json'))
-    const settings = JSON.parse(settingsString)
-    return settings.downloadDirectory
-}
-
-
 
 // Function to start a download
 function startDownload(params) {
@@ -65,7 +58,7 @@ function startDownload(params) {
                 params.user,
                 params.pack,
                 "", // expected file name
-                getDownloadDirectory(),
+                settings.get('downloadDirectory'),
             ]
         )
     }
