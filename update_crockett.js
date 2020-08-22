@@ -4,6 +4,7 @@
 const fs = require('fs')
 const https = require('https')
 const path = require('path')
+const log = require('electron-log')
 const {execSync} = require('child_process')
 const settings = require('./settings')
 
@@ -20,18 +21,18 @@ async function installOrUpdate() {
     }
     // Existing crockett. Update it?
     else {
-        const exeData = await getDateFromExe()
+        const exeDate = await getDateFromExe()
         const manifestDate = await getDateFromManifest()
 
         const threeHours = 180000
         const timeDiff = Math.abs(exeDate - manifestDate)
 
-        console.log({exeDate, manifestDate})
+        log.info({exeDate, manifestDate})
 
         if (timeDiff > threeHours)
             await replaceCrockett()
         else
-            console.log('manifest and exe dates are close enough')
+            log.info('manifest and exe dates are close enough')
     }
 }
 
@@ -45,10 +46,10 @@ function unzip(source, destination, password) {
         execSync(`${monoPath} ${unzipper_path} ${source} ${destination} '${password}'`)
     }
     else {
-        execSync(`${unzipper_path} ${source} ${destination} ${password}`)
+        execSync(`${unzipper_path} ${source} ${destination} ${password} '${password}'`)
     }
 
-    console.log('crockett successfully installed')
+    log.info('crockett successfully installed')
 }
 
 
@@ -57,7 +58,7 @@ async function getDateFromExe() {
     return new Promise((resolve, reject) => {
         fs.open('./crockett/Crockett.exe', 'r', function(status, fd) {
             if (status) {
-                console.log(status.message)
+                log.info(status.message)
                 return
             }
 
@@ -115,7 +116,7 @@ async function getDateFromManifest() {
 async function replaceCrockett() {
     // TODO: handle errors
     return new Promise((resolve, reject) => {
-        console.log('replacing crockett')
+        log.info('replacing crockett')
         const zip_path = path.join(__dirname, 'crockett', 'crockett.zip')
 
         // Download Crockett

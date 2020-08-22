@@ -6,6 +6,7 @@
 const {app, BrowserWindow, ipcMain, clipboard, dialog, shell} = require('electron')
 const path = require('path')
 const {execSync} = require('child_process')
+const log = require('electron-log')
 const downloadManager = require('./download_manager')
 const settings = require('./settings')
 const updateCrockett = require('./update_crockett')
@@ -20,12 +21,12 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
 
     // Make this app handle irc://... links
     let is_default_irc_app = app.setAsDefaultProtocolClient('irc')
-    if (!is_default_irc_app) console.log('was not able to become the default IRC app')
+    if (!is_default_irc_app) log.info('was not able to become the default IRC app')
     app.on("open-url", function(event, url) {
-        console.log('this link was clicked:', url)
+        log.info('this link was clicked:', url)
 
         if (mainWindow) {
-            console.log('sending the clicked link to mainWindow.webContents')
+            log.info('sending the clicked link to mainWindow.webContents')
             const trigger = clipboard.readText()
             mainWindow.webContents.send('link-clicked', {url, trigger})
         }
@@ -58,7 +59,7 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
         // This will throw an error if mono is not found.
         if (process.platform === 'darwin') {
             try {
-                console.log(execSync('/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --version').toString())
+                log.info(execSync('/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --version').toString())
             }
             catch (err) {
                 dialog.showMessageBoxSync({
@@ -86,10 +87,10 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
                 shell.openExternal('https://github.com/NigelKibodeaux/crockette/releases')
         }
         else {
-            console.log('You have the latest version of Crockette')
+            log.info('You have the latest version of Crockette')
         }
     })
-    // .catch(console.log) // TODO: handle errors somehow?
+    // .catch(log) // TODO: handle errors somehow?
 
     // Quit when all windows are closed.
     app.on('window-all-closed', () => app.quit())
@@ -110,7 +111,7 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
         updateCrockett()
             .then(() => mainWindow.loadFile('index.html'))
             .catch(err => {
-                console.log(err)
+                log.info(err)
 
                 // Must not have been right. Clear it.
                 settings.set('crockettDomain', null)
@@ -137,7 +138,7 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
     })
 
     ipcMain.on('kill-download', (event, id) => {
-        console.log('received kill-download event')
+        log.info('received kill-download event')
         downloadManager.stopDownload(id)
     })
 
