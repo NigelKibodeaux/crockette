@@ -38,12 +38,14 @@ async function installOrUpdate() {
 
 // Unzips a file
 function unzip(source, destination, password) {
+    const unzipper_path = path.join(__dirname, 'unzipper', 'unzipper.exe')
+
     if (process.platform === 'darwin') {
         const monoPath = '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono'
-        execSync(`${monoPath} unzipper/unzipper.exe ${source} ${destination} '${password}'`)
+        execSync(`${monoPath} ${unzipper_path} ${source} ${destination} '${password}'`)
     }
     else {
-        execSync(`unzipper/unzipper.exe ${source} ${destination} ${password}`)
+        execSync(`${unzipper_path} ${source} ${destination} ${password}`)
     }
 
     console.log('crockett successfully installed')
