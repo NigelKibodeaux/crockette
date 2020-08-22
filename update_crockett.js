@@ -20,10 +20,8 @@ async function installOrUpdate() {
     }
     // Existing crockett. Update it?
     else {
-        const [exeDate, manifestDate] = await Promise.all([
-            getDateFromExe(),
-            getDateFromManifest(),
-        ])
+        const exeData = await getDateFromExe()
+        const manifestDate = await getDateFromManifest()
 
         const threeHours = 180000
         const timeDiff = Math.abs(exeDate - manifestDate)
