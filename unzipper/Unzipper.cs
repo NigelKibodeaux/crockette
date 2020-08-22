@@ -10,7 +10,7 @@ class Program
     {
         Console.WriteLine("Zipfile: " + args[0]);
         Console.WriteLine("Destination Directory: " + args[1]);
-        Console.WriteLine("Password", args[2]);
+        Console.WriteLine("Password: " + args[2]);
 
         string zipPath = args[0];
         string extractDirectory = args[1];

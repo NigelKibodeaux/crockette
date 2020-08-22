@@ -46,7 +46,7 @@ function unzip(source, destination, password) {
         execSync(`${monoPath} ${unzipper_path} ${source} ${destination} '${password}'`)
     }
     else {
-        execSync(`${unzipper_path} ${source} ${destination} ${password} '${password}'`)
+        execSync(`${unzipper_path} ${source} ${destination} ${password} "${password}"`)
     }
 
     log.info('crockett successfully installed')
