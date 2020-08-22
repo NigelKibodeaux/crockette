@@ -10,7 +10,7 @@ const settings = require('./settings')
 const bytes_to_read = 2048
 const crockett_dir = path.join(__dirname, 'crockett')
 const dir_contents = fs.readdirSync(crockett_dir).filter(i => !i.startsWith('.'))
-const crockett_installed = dir_contents.length > 0
+const crockett_installed = dir_contents.includes('Crockett.exe')
 
 
 async function installOrUpdate() {
