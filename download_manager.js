@@ -72,7 +72,7 @@ function startDownload(params) {
                 params.user,
                 params.pack,
                 "", // expected file name
-                getDownloadDirectory(),
+                settings.get('downloadDirectory'),
             ]
         )
         downloads.get(id).childProcess.unref()
