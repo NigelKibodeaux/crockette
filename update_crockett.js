@@ -5,7 +5,7 @@ const fs = require('fs')
 const https = require('https')
 const path = require('path')
 const log = require('electron-log')
-const {execSync} = require('child_process')
+const {spawnSync} = require('child_process')
 const settings = require('./settings')
 
 const bytes_to_read = 2048
@@ -39,14 +39,22 @@ async function installOrUpdate() {
 
 // Unzips a file
 function unzip(source, destination, password) {
+    log.info('unzipping crockett')
     const unzipper_path = path.join(__dirname, 'unzipper', 'unzipper.exe')
+    let = result
 
     if (process.platform === 'darwin') {
         const monoPath = '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono'
-        execSync(`${monoPath} ${unzipper_path} ${source} ${destination} '${password}'`)
+        result = spawnSync(monoPath, [unzipper_path, source, destination, password])
     }
     else {
-        execSync(`${unzipper_path} ${source} ${destination} ${password} "${password}"`)
+        result = spawnSync(unzipper_path, [source, destination, password])
+    }
+
+    if (result.status > 0) {
+        log.error('Unzipper exit code ' + result.status)
+        log.error(result.stderr.toString())
+        throw new Error('Unzipper exit code ' + result.status)
     }
 
     log.info('crockett successfully installed')
