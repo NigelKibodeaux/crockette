@@ -41,7 +41,7 @@ async function installOrUpdate() {
 function unzip(source, destination, password) {
     log.info('unzipping crockett')
     const unzipper_path = path.join(__dirname, 'unzipper', 'unzipper.exe')
-    let = result
+    let result
 
     if (process.platform === 'darwin') {
         const monoPath = '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono'
@@ -146,6 +146,8 @@ async function replaceCrockett() {
             response.pipe(file)
 
             response.on('end', () => {
+                file.end()
+
                 // Unzip Crockett to the crockett dir
                 try {
                     unzip(zip_path, crockett_dir, settings.get('crockettPassword'))
