@@ -19,8 +19,20 @@ input {
 button#showLogs {
     float: right;
 }
+
 @media (prefers-color-scheme: dark) {
     body {
+        background:  #222;
         color: white;
+    }
+    a {
+        color: cornflowerblue;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        background:  white;
+        color: black;
     }
 }
