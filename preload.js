@@ -11,7 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     getDownloadDirectory: () => ipcRenderer.send('getSetting', 'downloadDirectory'),
 
-    killDownload: (id) => ipcRenderer.ipc.send('kill-download', id),
+    killDownload: (id) => ipcRenderer.send('kill-download', id),
 
     onStateUpdate: (callback) => ipcRenderer.on('state-update', callback),
 
