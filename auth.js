@@ -6,7 +6,7 @@ $('form').onsubmit = () => {
     const domain = $('domainInput').value
     const password = $('passwordInput').value
 
-    ipc.invoke('authUpdated', {domain, password})
+    window.electronAPI.authUpdated({domain, password})
         .catch(alert)
 
     return false

@@ -49,7 +49,7 @@
         const $ = document.getElementById.bind(document)
 
         // Handle logs button click
-        $('showLogs').onclick = () => ipc.send('show-logs')
+        $('showLogs').onclick = () => window.electronAPI.showLogs()
 
         // Handle form submit
         $('form').onsubmit = () => {

@@ -6,19 +6,18 @@
 // process.
 
 const $ = document.getElementById.bind(document)
-const ipc = window.ipcRenderer
 
 
 ;(async function getSettings() {
     // Set initial value of the download directory
-    const downloadDirectory = await ipc.invoke('getSetting', 'downloadDirectory')
+    const downloadDirectory = await window.electronAPI.getDownloadDirectory()
     document.getElementById('downloadDirectory').innerText = downloadDirectory
 })()
 .catch(alert)
 
 
 // Handle state update event
-ipc.on('state-update', (event, downloads) => {
+window.electronAPI.onStateUpdate((_event, downloads) => {
     let output = ''
     for (const [id, download] of downloads) {
         let network = id.split(' ')[0]
@@ -42,7 +41,7 @@ ipc.on('state-update', (event, downloads) => {
 
 
 // Handle a browser link click event from the main process
-ipc.on('link-clicked', (event, {url, trigger}) => {
+window.electronAPI.onLinkClicked((_event, {url, trigger}) => {
     $('linkElement').value = url
     $('messageElement').value = trigger
 })
@@ -63,7 +62,7 @@ $('form').onsubmit = function() {
         user: messageObj.user,
         pack: messageObj.pack,
     }
-    ipc.send('start-download', fileDownload)
+    window.electronAPI.startDownload(fileDownload)
 
     // Clear the inputs
     $('linkElement').value = ''
@@ -74,21 +73,21 @@ $('form').onsubmit = function() {
 
 
 // Handle logs button click
-$('showLogs').onclick = () => ipc.send('show-logs')
+$('showLogs').onclick = window.electronAPI.showLogs
 
 
 // Handle clicking download directory button
-$('selectDownloadDirectory').onclick = () => ipc.send('select-download-directory')
+$('selectDownloadDirectory').onclick = window.electronAPI.selectDownloadDirectory
 
 
 // Handle an update of the download direcotry from the main process
-ipc.on('download-directory-set', (event, directory) => {
+window.electronAPI.onDownloadDirectorySet((event, directory) => {
     document.getElementById('downloadDirectory').innerText = directory
 })
 
 
 // Handle log events from the main process
-ipc.on('log', (event, {message, color}) => {
+window.electronAPI.onLog((_event, {message, color}) => {
     console.log(`%c${message}`, `color:${color}`)
 })
 
@@ -97,6 +96,6 @@ ipc.on('log', (event, {message, color}) => {
 // eslint-disable-next-line no-unused-vars
 function stopDownload(id) {
     console.log('attempting to stop download:', id)
-    ipc.send('kill-download', id)
+    window.electronAPI.killDownload(id)
     return false
 }
