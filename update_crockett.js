@@ -1,18 +1,24 @@
 /* eslint-env node */
 'use strict'
 
+const { app } = require('electron')
 const fs = require('fs')
 const https = require('https')
 const path = require('path')
 const log = require('electron-log')
-const {spawnSync} = require('child_process')
+const { spawnSync } = require('child_process')
 const settings = require('./settings')
 
 const bytes_to_read = 2048
-const crockett_dir = path.join(__dirname, 'crockett')
-const dir_contents = fs.readdirSync(crockett_dir).filter(i => !i.startsWith('.'))
+const crockett_dir = path.join(app.getPath('appData'), 'Crockette', 'crockett')
+log.info('crockett_dir', crockett_dir)
+if (!fs.existsSync(crockett_dir)) fs.mkdirSync(crockett_dir)
+const dir_contents = fs.readdirSync(crockett_dir).filter((i) => !i.startsWith('.'))
 const crockett_installed = dir_contents.includes('Crockett.exe')
+log.info('crockett_installed', crockett_installed)
 
+const unzipper_dir = app.isPackaged ? process.resourcesPath : path.join(app.getAppPath(), 'unzipper')
+const path_to_unzipper = path.join(unzipper_dir, 'unzipper.exe')
 
 async function installOrUpdate() {
     // No Crockett. Get it.
@@ -27,28 +33,23 @@ async function installOrUpdate() {
         const threeHours = 180000
         const timeDiff = Math.abs(exeDate - manifestDate)
 
-        log.info({exeDate, manifestDate})
+        log.info({ exeDate, manifestDate })
 
-        if (timeDiff > threeHours)
-            await replaceCrockett()
-        else
-            log.info('manifest and exe dates are close enough')
+        if (timeDiff > threeHours) await replaceCrockett()
+        else log.info('manifest and exe dates are close enough')
     }
 }
-
 
 // Unzips a file
 function unzip(source, destination, password) {
     log.info('unzipping crockett')
-    const unzipper_path = path.join(__dirname, 'unzipper', 'unzipper.exe')
     let result
 
     if (process.platform === 'darwin') {
         const monoPath = '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono'
-        result = spawnSync(monoPath, [unzipper_path, source, destination, password])
-    }
-    else {
-        result = spawnSync(unzipper_path, [source, destination, password])
+        result = spawnSync(monoPath, [path_to_unzipper, source, destination, password])
+    } else {
+        result = spawnSync(path_to_unzipper, [source, destination, password])
     }
 
     if (result.status > 0) {
@@ -60,11 +61,10 @@ function unzip(source, destination, password) {
     log.info('crockett successfully installed')
 }
 
-
 // Reads date from the .exe
 async function getDateFromExe() {
     return new Promise((resolve, reject) => {
-        fs.open('./crockett/Crockett.exe', 'r', function(status, fd) {
+        fs.open(path.join(crockett_dir, 'Crockett.exe'), 'r', function (status, fd) {
             if (status) {
                 log.info(status.message)
                 return
@@ -85,41 +85,42 @@ async function getDateFromExe() {
     })
 }
 
-
 // Reads date from the manifest
 async function getDateFromManifest() {
     return new Promise((resolve, reject) => {
         const url = `https://www.${settings.get('crockettDomain')}/crockett.zip.manifest`
-        https.get(url, res => {
-            const { statusCode } = res
+        https
+            .get(url, (res) => {
+                const { statusCode } = res
 
-            let error
-            if (statusCode !== 200) {
-                error = new Error('Request Failed.\n' + `Status Code: ${statusCode}`)
-            }
-            if (error) {
-                reject(error)
-                // Consume response data to free up memory
-                res.resume()
-                return
-            }
+                let error
+                if (statusCode !== 200) {
+                    error = new Error('Request Failed.\n' + `Status Code: ${statusCode}`)
+                }
+                if (error) {
+                    reject(error)
+                    // Consume response data to free up memory
+                    res.resume()
+                    return
+                }
 
-            res.setEncoding('utf8')
-            let rawData = ''
-            res.on('data', (chunk) => { rawData += chunk })
-            res.on('end', () => {
-                const firstLine = rawData.split('\n')[0]
-                const numberString = firstLine.replace('BuildDate: ', '')
-                const hundredNanosecondsSinceZero = parseInt(numberString)
-                const hundredNanosecondsSince1970 = 621355968480000000
-                const timestamp = (hundredNanosecondsSinceZero - hundredNanosecondsSince1970) / 10000
-                resolve(new Date(timestamp))
+                res.setEncoding('utf8')
+                let rawData = ''
+                res.on('data', (chunk) => {
+                    rawData += chunk
+                })
+                res.on('end', () => {
+                    const firstLine = rawData.split('\n')[0]
+                    const numberString = firstLine.replace('BuildDate: ', '')
+                    const hundredNanosecondsSinceZero = parseInt(numberString)
+                    const hundredNanosecondsSince1970 = 621355968480000000
+                    const timestamp = (hundredNanosecondsSinceZero - hundredNanosecondsSince1970) / 10000
+                    resolve(new Date(timestamp))
+                })
             })
-        })
-        .on('error', reject)
+            .on('error', reject)
     })
 }
-
 
 async function replaceCrockett() {
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -127,48 +128,44 @@ async function replaceCrockett() {
     // TODO: handle errors
     return new Promise((resolve, reject) => {
         log.info('replacing crockett')
-        const zip_path = path.join(__dirname, 'crockett', 'crockett.zip')
+        const zip_path = path.join(crockett_dir, 'crockett.zip')
 
         // Download Crockett
         const url = `https://www.${settings.get('crockettDomain')}/crockett.zip`
-        https.get(url, response => {
-            const { statusCode } = response
+        https
+            .get(url, (response) => {
+                const { statusCode } = response
 
-            let error
-            if (statusCode !== 200) {
-                error = new Error('Request Failed.\n' + `Status Code: ${statusCode}`)
-            }
-            if (error) {
-                reject(error)
-                // Consume response data to free up memory
-                response.resume()
-                return
-            }
-            const file = fs.createWriteStream(zip_path)
-            response.pipe(file)
-
-            response.on('end', () => {
-                file.end()
-
-                // Unzip Crockett to the crockett dir
-                try {
-                    unzip(zip_path, crockett_dir, settings.get('crockettPassword'))
-                    resolve()
+                let error
+                if (statusCode !== 200) {
+                    error = new Error('Request Failed.\n' + `Status Code: ${statusCode}`)
                 }
-                catch (err) {
-                    reject(err)
+                if (error) {
+                    reject(error)
+                    // Consume response data to free up memory
+                    response.resume()
+                    return
                 }
+                const file = fs.createWriteStream(zip_path)
+                response.pipe(file)
+
+                response.on('end', () => {
+                    file.end()
+
+                    // Unzip Crockett to the crockett dir
+                    try {
+                        unzip(zip_path, crockett_dir, settings.get('crockettPassword'))
+                        resolve()
+                    } catch (err) {
+                        reject(err)
+                    }
+                })
             })
-
-
-        }).on('error', reject)
+            .on('error', reject)
     })
 }
 
-
 module.exports = installOrUpdate
-
-
 
 /*
 crockette auto-update

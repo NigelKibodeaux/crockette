@@ -4,26 +4,33 @@
   "version": "1.2.2",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "test": "eslint . && node string_parser.test.js",
     "build-unzipper": "cd unzipper; mcs -out:unzipper.exe -r:SharpCompress.dll Unzipper.cs",
-    "build-mac": "rm -r crockett/*; npm run build-unzipper; electron-packager ./ --platform=darwin --out=dist --protocol=irc --overwrite; npm run build-mac-zip;",
-    "build-mac-zip": "electron-installer-zip dist/Crockette-darwin-x64/Crockette.app dist/Crockette-Mac",
-    "build-windows": "rm -r crockett/*; npm run build-unzipper; electron-packager ./ --platform=win32 --out=dist --overwrite; npm run build-windows-zip",
-    "build-windows-zip": "cd dist/Crockette-win32-x64; zip -r ../Crockette-Windows.zip ./*",
     "build": "npm run build-mac; npm run build-windows",
-    "deploy-nigel": "npm run build-mac; rm -r /Applications/Crockette.app; cp -r ./dist/Crockette-darwin-x64/Crockette.app /Applications",
+    "deploy-nigel": "npm run make; rm -r /Applications/Crockette.app; cp -r ./out/Crockette-darwin-x64/Crockette.app /Applications",
     "remove-settings": "rm ~/Library/Application\\ Support/Crockette/config.json",
-    "preinstall": "echo 'checking for mono compiler' && mcs --version"
+    "remove-crockett": "rm -r ~/Library/Application\\ Support/Crockette/crockett",
+    "preinstall": "echo 'checking for mono compiler' && mcs --version",
+    "premake": "rm -r crockett/*; npm run build-unzipper",
+    "xxxpackage": "electron-forge package",
+    "make": "electron-forge make"
   },
   "devDependencies": {
-    "electron": "^19.0.4",
-    "electron-installer-zip": "^0.1.2",
-    "electron-packager": "^15.0.0",
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^32.0.1",
     "eslint": "^7.6.0"
   },
   "dependencies": {
-    "electron-log": "^4.2.4",
+    "electron-log": "^5.1.7",
+    "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^6.0.0"
   }
 }

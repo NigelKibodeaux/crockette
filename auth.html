@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta charset="UTF-8" />
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'" />
         <title>IRC Downloader</title>
         <style>
             * {
@@ -29,11 +30,11 @@
             <table>
                 <tr>
                     <td><label>Enter the domain where Crockett can be downloaded</label></td>
-                    <td><input id="domainInput"></td>
+                    <td><input id="domainInput" /></td>
                 </tr>
                 <tr>
                     <td><label>Enter the secret password</label></td>
-                    <td><input id="passwordInput"></td>
+                    <td><input id="passwordInput" /></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -43,21 +44,19 @@
         </form>
     </body>
 
-
     <script>
         const ipc = window.ipcRenderer
         const $ = document.getElementById.bind(document)
 
         // Handle logs button click
-        $('showLogs').onclick = () => window.electronAPI.showLogs()
+        $('showLogs').onclick = () => window.electronAPI.send('show-logs')
 
         // Handle form submit
         $('form').onsubmit = () => {
             const domain = $('domainInput').value
             const password = $('passwordInput').value
 
-            ipc.invoke('authUpdated', {domain, password})
-                .catch(alert)
+            window.electronAPI.send('auth-updated', { domain, password })
 
             return false
         }
