@@ -17,7 +17,6 @@ window.electronAPI.on('download-directory-set', (event, directory) => {
 
 // Handle state update event
 window.electronAPI.on('state-update', (_event, downloads) => {
-    console.log('state updated!', downloads)
     let output = ''
     for (const [id, download] of downloads) {
         let network = id.split(' ')[0]

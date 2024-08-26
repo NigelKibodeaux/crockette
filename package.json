@@ -8,7 +8,7 @@
     "test": "eslint . && node string_parser.test.js",
     "build-unzipper": "cd unzipper; mcs -out:unzipper.exe -r:SharpCompress.dll Unzipper.cs",
     "build": "npm run build-mac; npm run build-windows",
-    "deploy-nigel": "npm run make; rm -r /Applications/Crockette.app; cp -r ./out/Crockette-darwin-x64/Crockette.app /Applications",
+    "deploy-nigel": "npm run make; rm -r /Applications/Crockette.app; cp -r ./out/Crockette-darwin-arm64/Crockette.app /Applications",
     "remove-settings": "rm ~/Library/Application\\ Support/Crockette/config.json",
     "remove-crockett": "rm -r ~/Library/Application\\ Support/Crockette/crockett",
     "preinstall": "echo 'checking for mono compiler' && mcs --version",

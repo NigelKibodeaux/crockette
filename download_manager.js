@@ -1,16 +1,17 @@
 /* eslint-env node */
 'use strict'
 
-
 const path = require('path')
-const {spawn} = require('child_process')
-const {EventEmitter} = require('events')
+const { spawn } = require('child_process')
+const { EventEmitter } = require('events')
 const string_parser = require('./string_parser')
 const settings = require('./settings')
 const fs = require('fs')
+const { app } = require('electron')
 
+const crockettPath = path.join(app.getPath('appData'), 'Crockette', 'crockett', 'Crockett.exe')
 
-const eventEmitter = new EventEmitter();
+const eventEmitter = new EventEmitter()
 const downloads = new Map()
 const colors = [
     'royalblue',
@@ -33,8 +34,6 @@ function getNextColor() {
     return colors[colorIndex++]
 }
 
-
-
 // Function to start a download
 function startDownload(params) {
     const id = [params.network, params.channel, params.user, params.pack].join(' ')
@@ -48,33 +47,26 @@ function startDownload(params) {
     })
 
     if (process.platform === 'darwin') {
-        downloads.get(id).childProcess = spawn(
-            '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono',
-            [
-                path.join(__dirname, 'crockett', 'Crockett.exe'),
-                'download',
-                params.network,
-                params.channel,
-                params.user,
-                params.pack,
-                "", // expected file name
-                settings.get('downloadDirectory'),
-            ]
-        )
-    }
-    else {
-        downloads.get(id).childProcess = spawn(
-            path.join(__dirname, 'crockett', 'Crockett.exe'),
-            [
-                'download',
-                params.network,
-                params.channel,
-                params.user,
-                params.pack,
-                "", // expected file name
-                settings.get('downloadDirectory'),
-            ]
-        )
+        downloads.get(id).childProcess = spawn('/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono', [
+            crockettPath,
+            'download',
+            params.network,
+            params.channel,
+            params.user,
+            params.pack,
+            '', // expected file name
+            settings.get('downloadDirectory'),
+        ])
+    } else {
+        downloads.get(id).childProcess = spawn(crockettPath, [
+            'download',
+            params.network,
+            params.channel,
+            params.user,
+            params.pack,
+            '', // expected file name
+            settings.get('downloadDirectory'),
+        ])
         downloads.get(id).childProcess.unref()
     }
 
@@ -114,7 +106,6 @@ function startDownload(params) {
     })
 }
 
-
 // Stop a download. Remove it from the list if it's already stopped.
 function stopDownload(id) {
     console.log('stopping:', id)
@@ -122,13 +113,11 @@ function stopDownload(id) {
 
     if (!download.stopped) {
         download.childProcess.kill()
-    }
-    else {
+    } else {
         downloads.delete(id)
         eventEmitter.emit('state-update')
     }
 }
-
 
 // Stop all downloads
 function stopAllDownloads() {
@@ -136,7 +125,6 @@ function stopAllDownloads() {
         stopDownload(id)
     }
 }
-
 
 module.exports = {
     startDownload,

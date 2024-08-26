@@ -47,7 +47,7 @@ app.whenReady()
         else mainWindow.loadFile('auth.html')
 
         // Open the DevTools.
-        mainWindow.webContents.openDevTools()
+        // mainWindow.webContents.openDevTools()
     })
     .then(() => {
         // Check that mono is installed on a mac.
