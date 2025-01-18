@@ -4,18 +4,17 @@ const progress_regex = /DEBUG IrcClient - \[(.+)%\] (\S+) (\S+) (\S+) (\S+)/
 const speed_regex = /DEBUG IrcClient - \[(.+) kB\/s\] (\S+) (\S+) (\S+) (\S+)/
 const filename_regex = /DEBUG IrcClient - File transfer started: (\S+) - (\S+)/
 
-
 // Make this run in the browser or in node
-const outside_world = typeof(window) !== 'undefined' ? window : exports
+const outside_world = typeof window !== 'undefined' ? window : exports
 
 /**
  * Updates the individual download object with the input.
  * Returns true if anything changed
  */
-outside_world.updateDownloadFromInput = function(download, input) {
+outside_world.updateDownloadFromInput = function (download, input) {
     let changed = false
 
-    input.split('\n').forEach(line => {
+    input.split('\n').forEach((line) => {
         // Look for the filename
         let match = line.match(filename_regex)
         if (match) {
@@ -43,13 +42,16 @@ outside_world.updateDownloadFromInput = function(download, input) {
 }
 
 outside_world.parseLink = function parseLink(input) {
-    const link_regex = /irc:\/\/([^/]+)\/([^/]+)/
-    let matches = input.match(link_regex)
-    let network = matches[1]
+    const cleaned_input = input.replace(/irc:\/\//, '').replace(/\/$/, '')
+    const link_regex = /([^/]+)\/([^/]+)/
+
+    let matches = cleaned_input.match(link_regex)
+    let network = matches?.[1]
+    let channel = matches?.[2]
 
     return {
-        network: network.split(':')[0],
-        channel: '#' + matches[2]
+        network: network?.split(':')[0],
+        channel: channel && '#' + channel,
     }
 }
 
