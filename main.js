@@ -10,6 +10,8 @@ const downloadManager = require('./download_manager')
 const settings = require('./settings')
 const updateCrockett = require('./update_crockett')
 const crocketteUpdateIsAvailable = require('./update_crockette')
+const { getMonoPath } = require('./mono')
+
 let mainWindow
 let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettPassword')
 
@@ -54,9 +56,8 @@ app.whenReady()
         // This will throw an error if mono is not found.
         if (process.platform === 'darwin') {
             try {
-                log.info(
-                    execSync('/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --version').toString(),
-                )
+                const monoPath = getMonoPath()
+                log.info(execSync(`${monoPath} --version`).toString())
             } catch (err) {
                 dialog.showMessageBoxSync({
                     type: 'warning',

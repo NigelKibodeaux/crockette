@@ -8,6 +8,7 @@ const path = require('path')
 const log = require('electron-log')
 const { spawnSync } = require('child_process')
 const settings = require('./settings')
+const { getMonoPath } = require('./mono')
 
 const bytes_to_read = 2048
 const crockett_dir = path.join(app.getPath('appData'), 'Crockette', 'crockett')
@@ -46,7 +47,7 @@ function unzip(source, destination, password) {
     let result
 
     if (process.platform === 'darwin') {
-        const monoPath = '/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono'
+        const monoPath = getMonoPath()
         result = spawnSync(monoPath, [path_to_unzipper, source, destination, password])
     } else {
         result = spawnSync(path_to_unzipper, [source, destination, password])

@@ -10,7 +10,12 @@ module.exports = {
     makers: [
         {
             name: '@electron-forge/maker-squirrel',
-            config: {},
+            config: {
+                name: 'crockette',
+                authors: 'Nigel Kibodeaux',
+                exe: 'crockette.exe',
+                setupExe: 'CrocketteInstaller.exe',
+            },
         },
         {
             name: '@electron-forge/maker-zip',

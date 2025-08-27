@@ -8,6 +8,7 @@ const string_parser = require('./string_parser')
 const settings = require('./settings')
 const fs = require('fs')
 const { app } = require('electron')
+const { getMonoPath } = require('./mono')
 
 const crockettPath = path.join(app.getPath('appData'), 'Crockette', 'crockett', 'Crockett.exe')
 
@@ -47,7 +48,8 @@ function startDownload(params) {
     })
 
     if (process.platform === 'darwin') {
-        downloads.get(id).childProcess = spawn('/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono', [
+        const monoPath = getMonoPath()
+        downloads.get(id).childProcess = spawn(monoPath, [
             crockettPath,
             'download',
             params.network,
