@@ -7,22 +7,19 @@
     "start": "electron-forge start",
     "test": "eslint . && node string_parser.test.js",
     "build-unzipper": "cd unzipper; mcs -out:unzipper.exe -r:SharpCompress.dll Unzipper.cs",
-    "build": "npm run build-mac; npm run build-windows",
+    "build": "npm run build-mac && npm run build-windows",
+    "build-mac": "npm run make",
+    "build-windows": "npm run build-unzipper && electron-forge make --platform win32 --arch x64",
     "deploy-nigel": "npm run make; rm -r /Applications/Crockette.app; cp -r ./out/Crockette-darwin-arm64/Crockette.app /Applications",
     "remove-settings": "rm ~/Library/Application\\ Support/Crockette/config.json",
     "remove-crockett": "rm -r ~/Library/Application\\ Support/Crockette/crockett",
     "preinstall": "echo 'checking for mono compiler' && mcs --version",
-    "premake": "rm -r crockett/*; npm run build-unzipper",
-    "xxxpackage": "electron-forge package",
+    "premake": "npm run build-unzipper",
     "make": "electron-forge make"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
-    "@electron-forge/maker-deb": "^7.4.0",
-    "@electron-forge/maker-rpm": "^7.4.0",
-    "@electron-forge/maker-squirrel": "^7.4.0",
     "@electron-forge/maker-zip": "^7.4.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "^10.0.1",
@@ -33,7 +30,6 @@
   },
   "dependencies": {
     "electron-log": "^5.1.7",
-    "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^6.0.0"
   }
 }
