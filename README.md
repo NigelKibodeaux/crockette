@@ -10,5 +10,7 @@ npm start
 To publish a new version:
 
 1. `npm version major|minor|patch`
-1. `npm run build`
-1. Create a release on Github and upload the Mac and Windows zips from `out/make/zip/`
+1. `git push --follow-tags`
+1. The Release workflow on Github builds the Mac and Windows zips and publishes the release. Running copies of Crockette will then prompt their users to update.
+
+To build the zips locally instead, run `npm run build` and look in `out/make/zip/`.
