@@ -9,7 +9,9 @@ function getMonoPath() {
     try {
         const whichMono = execSync('which mono').toString().trim()
         if (whichMono) candidates.push(whichMono)
-    } catch {}
+    } catch {
+        // `which` found nothing; fall through to the known locations
+    }
 
     // Try Homebrew locations
     candidates.push('/opt/homebrew/bin/mono')
@@ -23,7 +25,9 @@ function getMonoPath() {
             execSync(`${monoPath} --version`)
             cachedMonoPath = monoPath
             return cachedMonoPath
-        } catch {}
+        } catch {
+            // not at this location; try the next one
+        }
     }
 
     throw new Error('Mono not found. Please install Mono and ensure it is in your PATH.')

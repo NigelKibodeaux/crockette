@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict'
 
 // Modules to control application life and create native browser window
@@ -58,7 +57,7 @@ app.whenReady()
             try {
                 const monoPath = getMonoPath()
                 log.info(execSync(`${monoPath} --version`).toString())
-            } catch (err) {
+            } catch {
                 dialog.showMessageBoxSync({
                     type: 'warning',
                     message: 'Downloads will not work. Install the latest version of mono and restart.',
@@ -87,7 +86,7 @@ app.whenReady()
             } else {
                 log.info('You have the latest version of Crockette')
             }
-        } catch (err) {
+        } catch {
             dialog.showMessageBoxSync({
                 type: 'warning',
                 message: 'Could not check for updates to Crockette',
@@ -127,7 +126,7 @@ ipcMain.on('auth-updated', (event, { domain, password }) => {
         })
 })
 
-ipcMain.on('get-download-directory', (event, key) => {
+ipcMain.on('get-download-directory', () => {
     const downloadDirectory = settings.get('downloadDirectory')
     mainWindow.webContents.send('download-directory-set', downloadDirectory)
 })

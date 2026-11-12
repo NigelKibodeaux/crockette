@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict'
 
 const path = require('path')
@@ -6,7 +5,6 @@ const { spawn } = require('child_process')
 const { EventEmitter } = require('events')
 const string_parser = require('./string_parser')
 const settings = require('./settings')
-const fs = require('fs')
 const { app } = require('electron')
 const { getMonoPath } = require('./mono')
 

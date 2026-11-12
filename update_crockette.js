@@ -1,7 +1,5 @@
 'use strict'
 
-const https = require('https')
-const { dialog } = require('electron')
 const current_version = require('./package.json').version
 
 async function updateIsAvailable() {
@@ -18,7 +16,7 @@ async function getLatestVersion() {
     if (!res.ok) {
         throw new Error('Request Failed.\n' + `Status Code: ${res.status}`)
     }
-    return await res.json().tag_name
+    return (await res.json()).tag_name
 }
 
 module.exports = updateIsAvailable

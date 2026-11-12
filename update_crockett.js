@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict'
 
 const { app } = require('electron')

@@ -51,12 +51,12 @@ $('form').onsubmit = function () {
     let messageObj
     try {
         linkObj = window.parseLink($('linkElement').value)
-    } catch (e) {
+    } catch {
         alert('could not parse link')
     }
     try {
         messageObj = window.parseMessage($('messageElement').value)
-    } catch (e) {
+    } catch {
         alert('could not parse message')
     }
 
