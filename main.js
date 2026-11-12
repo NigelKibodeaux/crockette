@@ -19,15 +19,28 @@ let hasDomainAndPass = settings.get('crockettDomain') && settings.get('crockettP
 // Make this app handle irc://... links
 let is_default_irc_app = app.setAsDefaultProtocolClient('irc')
 if (!is_default_irc_app) log.info('was not able to become the default IRC app')
-app.on('open-url', function (event, url) {
+// A clicked link that the window hasn't received yet. When the link is what launches
+// the app, it arrives before the window exists, so it is held here until the page is ready.
+let pendingLink = null
+let rendererIsReady = false
+
+app.on('open-url', async function (event, url) {
     log.info('this link was clicked:', url)
 
-    if (mainWindow) {
-        log.info('sending the clicked link to mainWindow.webContents')
-        const trigger = clipboard.readText()
-        mainWindow.webContents.send('link-clicked', { url, trigger })
-    }
+    // clipboard.readText() returns a promise in current Electron (it used to return a string)
+    const trigger = await clipboard.readText()
+
+    pendingLink = { url, trigger }
+    sendPendingLink()
 })
+
+function sendPendingLink() {
+    if (!pendingLink || !rendererIsReady || !mainWindow || mainWindow.isDestroyed()) return
+
+    log.info('sending the clicked link to mainWindow.webContents')
+    mainWindow.webContents.send('link-clicked', pendingLink)
+    pendingLink = null
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -126,9 +139,14 @@ ipcMain.on('auth-updated', (event, { domain, password }) => {
         })
 })
 
+// The main page sends this as soon as its script has loaded
 ipcMain.on('get-download-directory', () => {
     const downloadDirectory = settings.get('downloadDirectory')
     mainWindow.webContents.send('download-directory-set', downloadDirectory)
+
+    // The page can now receive a link that was clicked before it was ready
+    rendererIsReady = true
+    sendPendingLink()
 })
 
 ipcMain.handle('setSetting', (event, key, value) => {
